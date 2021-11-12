@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block header %} Главная страница {% endblock header %}
+{% block title %}Последние обновления на сайте{% endblock %}
+{% block content %}
+  {% for post in page_obj %}
+      <div class="container py-5">    
+          <ul>
+            <li>
+              Автор: {{ post.author }}
+            </li>
+            <li>
+              Дата публикации: {{ post.pub_date|date:'d E Y'}}
+            </li>
+          </ul>      
+          <p> {{ post.text }}</p>
+          <a href="{% url 'posts:post_detail' post.pk %}">подробная информация</a>
+          <p> 
+          {% if post.group %}
+            <a href="{% url 'posts:group_list' post.group.slug %}"> 
+              все записи группы
+            </a>
+          </p>
+          {% if not forloop.last %}<hr>{% endif %}
+          {% endif %}
+      </div>
+  {% endfor %}
+
+  {% include 'includes/paginator.html' %}
+{% endblock content %} 
