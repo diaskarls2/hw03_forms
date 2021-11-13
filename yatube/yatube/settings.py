@@ -58,6 +58,8 @@ ROOT_URLCONF = 'yatube.urls'
 LOGIN_URL = 'users:login'
 LOGIN_REDIRECT_URL = 'posts:index'
 
+PAGE_SIZE = '10'
+
 
 STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static'),)
 TEMPLATES_DIR = os.path.join(BASE_DIR, 'templates')

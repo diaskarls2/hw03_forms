@@ -1,50 +1,45 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.core.paginator import Paginator
+from django.conf import settings
 
 from .models import Post, Group, User
 from .forms import PostForm
 
 
-def index(request):
-    post_list = Post.objects.all().order_by('-pub_date')
-    paginator = Paginator(post_list, 10)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
-    context = {
-        'page_obj': page_obj,
+def get_paginator_context(queryset, page_number, page_size=settings.PAGE_SIZE):
+    paginator = Paginator(queryset, page_size)
+    return {
+        'paginator': paginator,
+        'page_number': page_number,
+        'page_obj': paginator.get_page(page_number),
     }
+
+
+def index(request): 
+    context = get_paginator_context(Post.objects.all(), request)
     return render(request, 'posts/index.html', context)
 
 
 def group_list(request, slug):
     template = 'posts/group_list.html'
     group = get_object_or_404(Group, slug=slug)
-    posts = Post.objects.filter(group=group).order_by('-pub_date')
-    paginator = Paginator(posts, 10)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
+    posts = Post.objects.filter(group=group)
     context = {
-        'posts': posts,
         'group': group,
-        'page_obj': page_obj
+        'posts': posts
     }
+    context.update(get_paginator_context(group.posts.all(), request))
     return render(request, template, context)
 
 
 def profile(request, username):
-    user = User.objects.get(username=username)
-    post_list = Post.objects.filter(author=user).order_by('-pub_date')
-    paginator = Paginator(post_list, 10)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
-    count = paginator.count
+    profile_auth = get_object_or_404(User, username=username)
+    post_auth = profile_auth.posts.all()
     context = {
-        'user': user,
-        'post_list': post_list,
-        'page_obj': page_obj,
-        'count': count,
-        'username': username,
+        'post_auth': post_auth,
+        'profile_auth': profile_auth
     }
+    context.update(get_paginator_context(profile_auth.posts.all(), request))
     return render(request, 'posts/profile.html', context)
 
 
@@ -68,7 +63,7 @@ def post_create(request):
             group_variable = form.cleaned_data['group']
             Post.objects.create(text=text_variable, group=group_variable,
                                 author=request.user)
-            return redirect('posts:profile', username=request.user)
+            return redirect(f'/profile/{request.user}/', username=request.user)
         return render(request, 'posts/create_post.html', {'form': form})
     form = PostForm()
     return render(request, 'posts/create_post.html', {'form': form})
