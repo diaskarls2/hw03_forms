@@ -15,7 +15,7 @@ def get_paginator_context(queryset, page_number, page_size=settings.PAGE_SIZE):
     }
 
 
-def index(request): 
+def index(request):
     context = get_paginator_context(Post.objects.all(), request)
     return render(request, 'posts/index.html', context)
 
