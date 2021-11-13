@@ -1,8 +1,8 @@
 {% extends 'base.html' %}
 {% load  static %}
-{% block header %}
+{% block title %}
   Пост {{ post.text|truncatechars:30 }}
-{% endblock header %}    
+{% endblock %}    
 {% block content %}
     {% for post in user_posts %}
       <div class="row">
