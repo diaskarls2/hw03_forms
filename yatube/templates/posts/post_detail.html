@@ -4,14 +4,13 @@
   Пост {{ post.text|truncatechars:30 }}
 {% endblock %}    
 {% block content %}
-    {% for post in user_posts %}
       <div class="row">
         <aside class="col-12 col-md-3">
           <ul class="list-group list-group-flush">
             <li class="list-group-item">
               Дата публикации: {{ post.pub_date }} 
             </li>
-            {% if post.group != Null %} 
+            {% if post.group %} 
               <li class="list-group-item">
                 Группа: {{ group.title }}
               <a href="{% url 'posts:group_list' post.group.slug %}"> 
@@ -33,6 +32,7 @@
           </ul>
         </aside>
         <article class="col-12 col-md-9">
+        {%if user == post.author %}
           <p>
             <a class='btn btn-primary'
                 href={% url 'posts:post_edit' post_id=post.pk %}
@@ -40,8 +40,8 @@
                 Редактировать пост
             </a>
           </p>
+        {% endif %}
           <p>{{ post.text }}</p>
         </article>
       </div> 
-    {% endfor %}
 {% endblock content %}
