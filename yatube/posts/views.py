@@ -42,14 +42,12 @@ def post_detail(request, post_id):
 
 @login_required
 def post_create(request):
-    if request.method == 'POST':
-        form = PostForm(request.POST or None)
-        if form.is_valid():
-            post = form.save(commit=False)
-            post.author = request.user
-            form.save()
-            return redirect('posts:profile', username=request.user.username)
-        return render(request, 'posts/create_post.html', {'form': form})
+    form = PostForm(request.POST or None)
+    if form.is_valid():
+        post = form.save(commit=False)
+        post.author = request.user
+        form.save()
+        return redirect('posts:profile', username=request.user.username)
     form = PostForm()
     return render(request, 'posts/create_post.html', {'form': form})
 
@@ -61,11 +59,9 @@ def post_edit(request, post_id):
     if post.author != request.user:
         return redirect('posts:post_detail', post_id=post.id)
     is_edit = True
-    if request.method == 'POST':
-        form = PostForm(request.POST, instance=post)
-        if form.is_valid():
-            form.save()
-            return redirect('posts:post_detail', post_id=post.id)
-        return render(request, 'posts/create_post.html', {'form': form})
+    form = PostForm(request.POST or None, instance=post)
+    if form.is_valid():
+        form.save()
+        return redirect('posts:post_detail', post_id=post.id)
     return render(request, 'posts/create_post.html',
                   {'form': form, 'is_edit': is_edit})
